@@ -1,0 +1,18 @@
+{
+  "name": "dataretriever",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pic4carto": "^2.0.16",
+    "request": "^2.88.0"
+  }
+}
