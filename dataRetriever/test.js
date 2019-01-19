@@ -28,6 +28,19 @@ var loadFile = function (filename) {
 	return JSON.parse(contents);
 }
 
+// the angle between the two points (lat, lon for each one)
+var angleOfTwoPoints = function (p1, p2) {
+	var dy = p2.lat - p1.lat;
+	var dx = Math.cos(Math.PI / (180 * p1.lat)) * (p2.lon - p1.lon);
+	var theta = Math.atan2(dy, dx);
+	return theta;
+}
+
+// return true only if the direction of the picture is correct
+var shouldKeepPicture = function (picture, centerPoint, picturePoint) {
+	var angle = angleOfTwoPoints(centerPoint, picturePoint);
+	return angle < 60 && angle > 60;
+}
 
 var main = function () {
 	var input = loadFile("input.json");

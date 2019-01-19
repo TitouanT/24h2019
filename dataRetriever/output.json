@@ -1,15 +1,15 @@
 {
 	"intersections": [
 		{
-			"crossingType": "stop",
 			"center": {
 				"lat": 48.0159348,
-				"long": 0.2034504
+				"lon": 0.2034504
 			},
 			"direction": [
 				{
 					"lat": 48.0159348,
-					"long": 0.2034504,
+					"lon": 0.2034504,
+					"crossingType": "stop",
 					"images": [
 						{
 							"path": "azertyuiop.jpg",
