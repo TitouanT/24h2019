@@ -5,23 +5,11 @@
 				"lat": 48.0159348,
 				"lon": 0.2034504
 			},
-			"direction": [
-				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
-					"crossingType": "stop"
-				},
-				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
-					"crossingType": "none"
-				},
-				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
-					"crossingType": "stop"
-				}
-			]
+			"direction": {
+				"lat": 48.0159348,
+				"lon": 0.2034504,
+				"stop": "yes|no|none"
+			}
 		}
 	]
 }
