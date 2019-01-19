@@ -1,5 +1,6 @@
 
 var P4C = require("pic4carto");
+var jsts = require("jsts");
 var fs = require('fs');
 var request = require('request');
 var directory = 'img/'
@@ -32,11 +33,42 @@ var shouldKeepPicture = function (picture, centerPoint, picturePoint) {
 	return angle < 60 && angle > 60;
 }
 
+const mapCoordsArray = (arr, fct) => {
+	if(arr.length === 2 && typeof arr[0] === "number" && typeof arr[1] === "number") {
+		return fct(arr[0], arr[1]);
+	}
+	else {
+		return arr.map(a => mapCoordsArray(a, fct));
+	}
+};
+
+const cvt4326to3857 = (lon,lat) => {
+	const x = lon * 20037508.34 / 180;
+	let y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+	y = y * 20037508.34 / 180;
+	return [x, y];
+};
+
+const cvt3857to4326 = (x, y) => {
+	const lon = x *  180 / 20037508.34;
+	const lat = Math.atan(Math.exp(y * Math.PI / 20037508.34)) * 360 / Math.PI - 90;
+	return [lon, lat];
+};
+
+const geomFactory = new jsts.geom.GeometryFactory();
+
+var debug = function (p) {
+	console.log(p.lat.toFixed(6) + "\t" + p.lon.toFixed(6) + "\tcross5\tred\t1");
+}
 class Position {
 	
 	constructor(lat, lon) {
 		this.lat = lat;
 		this.lon = lon;
+	}
+
+	debug() {
+		console.log(this.lat.toFixed(6) + "\t" + this.lon.toFixed(6) + "\tcross5\tred\t1");
 	}
 
 	movePoint(northMeters, eastMeters) {
@@ -86,6 +118,71 @@ class Position {
 		return [bound1, bound2];
 	}
 
+	static toGeoJSON(points) {
+		var json = {
+			"type": "Feature",
+			"geometry": {
+				"type": "MultiPoint",
+				"coordinates": []
+			},
+			"properties": {
+				"id": "patate-sucree"	  
+			}
+		};
+		for(var i = 0 ; i < points.length ; i++) {
+			json["geometry"]["coordinates"].push([points[i].lon, points[i].lat]);
+		}
+		return json;
+	}
+
+
+
+	static getBufferAroundPoints(points) {
+
+		let json = Position.toGeoJSON(points);
+		let geom = json.geometry;
+
+		let g = (new jsts.io.GeoJSONReader()).read({
+			type: geom.type, 
+			coordinates: mapCoordsArray(geom.coordinates, cvt4326to3857)
+		});
+
+		
+		g = g.buffer(40);
+		const res = (new jsts.io.GeoJSONWriter()).write(g);
+		res.coordinates = mapCoordsArray(res.coordinates, cvt3857to4326);
+
+		var buffer = (new jsts.io.GeoJSONReader()).read(geom); // normalement g!!!!!!!!!!!!
+
+		const envl = buffer.getEnvelopeInternal();
+
+					return picManager 
+					.startPicsRetrieval(
+						new P4C.LatLngBounds(new P4C.LatLng(envl.getMinY(), envl.getMinX()), new P4C.LatLng(envl.getMaxY(), envl.getMaxX())),
+						{
+							mindate: 0
+						}
+					)
+					.then(pics => {
+						//Only send pics in buffer around feature geometry
+						return pics.filter(p => {
+							console.log(p.pictureUrl);
+							return buffer.contains(
+								geomFactory.createPoint(
+									new jsts.geom.Coordinate(
+										p.coordinates.lng,
+										p.coordinates.lat
+									)
+								)
+							);
+						});
+
+					}).catch(console.log);
+
+	}
+
+
+
 }
 
 
@@ -134,7 +231,8 @@ function promisedProperties(object) {
 }
 
 var main = function () {
-	
+
+	/*
 	p1 = new Position(47.999953, 0.197648);//47.992638, 0.193792);
 	p2 = new Position(47.999477, 0.196664);
 
@@ -158,6 +256,7 @@ var main = function () {
 	// n e
 	//console.log(p1.movePoint(1000000, 0.000000));
 	return 0;
+	*/
 
 	var inputFile  = "input.json";
 	var outputFile = "edited.json";
@@ -169,14 +268,23 @@ var main = function () {
 	})
 */
 
-	X.then(function(element) {
+	/*X.then(function(element) {
 		//console.log(element);
 		for(i = 0 ; i < input.intersections.length ; i++) {
 			input.intersections[i] = element[i];
 		}
 		//console.log(JSON.stringify(element));
 		console.log(input);
-	});
+	});*/
+
+	for(var i = 0 ; i < 20 ; i++){// input.intersections.length ; i++) {
+		var intersection = input.intersections[i];
+		var p1 = intersection["center"];
+		var p2 = intersection["direction"];
+		debug(p1);
+		debug(p2);
+		Position.getBufferAroundPoints([p1, p2]);
+	}
 	
 
 	/*for (var i = 0 ; i < input.intersections.length ; i++) {

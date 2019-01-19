@@ -64,7 +64,11 @@ def backward(node):
     if index == len(way["nodes"]) -1:
         return None
 
-    othernode = nodes_by_id[way["nodes"][index + 1]]
+    if len(way["nodes"]) >= index + 3:
+        othernode = nodes_by_id[way["nodes"][index + 2]]
+    else:
+        othernode = nodes_by_id[way["nodes"][index + 1]]
+
 
     obj = {}
     center = {}

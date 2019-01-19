@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "pic4carto": "^2.0.16",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "jsts": "^2.0.3"
   }
 }
