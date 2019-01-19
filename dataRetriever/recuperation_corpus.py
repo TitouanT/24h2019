@@ -2,7 +2,7 @@
 import json
 from pprint import pprint
 
-with open("data.json") as f:
+with open("./raw_overpass_data.json") as f:
     data = json.load(f)["elements"]
 
 
@@ -102,4 +102,6 @@ for stop in stops:
 processed = {}
 processed["intersections"] = intersections
 
-pprint(processed)
+jsondata = json.dumps(processed, indent=4)
+# jsondata = json.dumps(processed)
+print(jsondata)
