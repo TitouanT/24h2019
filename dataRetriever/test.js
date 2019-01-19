@@ -25,7 +25,7 @@ filename : file to load (JSON)
 var loadFile = function (filename) {
 	var contents = fs.readFileSync(filename);
 	// Define to JSON type
-	var jsonContent = JSON.parse(contents);
+	return JSON.parse(contents);
 }
 
 
@@ -47,7 +47,6 @@ var main = function () {
 				});
 		}
 	}
+}
 
-
-
-
+main()
