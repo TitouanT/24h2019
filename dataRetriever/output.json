@@ -9,24 +9,17 @@
 				{
 					"lat": 48.0159348,
 					"lon": 0.2034504,
-					"crossingType": "stop",
-					"images": [
-						{
-							"path": "azertyuiop.jpg",
-							"distanceToCenter": 5,
-							"angleFromOrientation": 30
-						},
-						{
-							"path": "qsdfghjklm.jpg",
-							"distanceToCenter": 5,
-							"angleFromOrientation": 30
-						},
-						{
-							"path": "wxcvbnkkzç.jpg",
-							"distanceToCenter": 5,
-							"angleFromOrientation": 30
-						}
-					]
+					"crossingType": "stop"
+				},
+				{
+					"lat": 48.0159348,
+					"lon": 0.2034504,
+					"crossingType": "none"
+				},
+				{
+					"lat": 48.0159348,
+					"lon": 0.2034504,
+					"crossingType": "stop"
 				}
 			]
 		}
