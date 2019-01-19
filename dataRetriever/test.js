@@ -7,18 +7,6 @@ global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 global.XMLHttpRequest.DONE = 4;
 
 var picManager = new P4C.PicturesManager();
-var imageCounter = 0
-
-/*
-uri : download uri
-filename : output filename 
-callback : what to call after
-*/
-var download = function (uri, filename, callback) {
-	request.head(uri, function (err, res, body) {
-		request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-	});
-};
 
 /*
 filename : file to load (JSON)
@@ -27,6 +15,14 @@ var loadFile = function (filename) {
 	var contents = fs.readFileSync(filename);
 	// Define to JSON type
 	return JSON.parse(contents);
+}
+
+var saveFile = function (filename, object) {
+	var contents = JSON.stringify(object);
+	fs.writeFile(filename, contents, function(err) {
+		if(err)
+			console.log(err);
+	});
 }
 
 // the angle between the two points (lat, lon for each one)
@@ -51,29 +47,78 @@ var copyFile = function (filename, outFilename) {
 	});
 }
 
-var retrieveImage = function (lat, long) {
-	picManager.startPicsRetrievalAround(new P4C.LatLng(lat, long), 15, { mindate: 0, towardscenter: true })
+var retrieveImages = function (point, intersection) {
+	return picManager.startPicsRetrievalAround(new P4C.LatLng(point.lat, point.lon), 50, {mindate: 0, towardscenter: true})
 		.then(function (pictures) {
-			for (k = 0; k < pictures.length; k++ , imageCounter++) {
+			images = []
+			for (var k = 0 ; k < pictures.length ; k++) {
 				var pic = pictures[k];
-				/*download(pic.pictureUrl, directory + imageCounter + '.jpg', function () {
-					console.log('Downloaded');
-				});*/
-				console.log(pic.coordinates);
-				console.log(pic.direction);
+				if (true || shouldKeepPicture(pic, intersection.center, pic)) {
+					//console.log(pic.coordinates);
+					//console.log(pic.direction);
+					//console.log(pic.pictureUrl);
+					images.push({
+						"pathExt": pic.pictureUrl
+					});
+				}
 			}
+			point['images'] = images;
+			return point; //images;
 		});
 }
 
-var main = function () {
-	var input = loadFile("input.json");
+// function that takes an object with properties that might be promises and
+// returns a promise of that object with resolved properties.
+function promisedProperties(object) {
+  let promisedProperties = [];
+  const objectKeys = Object.keys(object);
+  objectKeys.forEach((key) => promisedProperties.push(object[key]));
+  return Promise.all(promisedProperties)
+    .then((resolvedValues) => {
+      return resolvedValues.reduce((resolvedObject, property, index) => {
+        resolvedObject[objectKeys[index]] = property;
+        return resolvedObject;
+      }, object);
+    });
 
-	copyFile("input.json", "output.json")
-	for (var i = 0; i < input.intersections.length; i++) {
-		for (var j = 0; j < input.intersections[i].direction.length; j++) {
-			retrieveImage(input.intersections[i].direction[j].lat, input.intersections[i].direction[j].lon)
+}
+
+var main = function () {
+	
+	var inputFile  = "input.json";
+	var outputFile = "edited.json";
+	var input = loadFile(inputFile);
+
+
+	X = promisedProperties(input.intersections.map(function(int) {
+		return promisedProperties(int.direction.map(dir => retrieveImages(dir, int)))
+	}))
+
+
+	X.then(function(element) {
+		//console.log(element);
+		for(i = 0 ; i < input.intersections.length ; i++) {
+			for(j = 0 ; j < input.intersections[i].direction.length ; j++) {
+				console.log(element[i+j])
+				input.intersections[i].direction[j] = element[i+j];
+			}
 		}
-	}
+		//console.log(JSON.stringify(element));
+		console.log(input);
+	});
+	
+
+	/*for (var i = 0 ; i < input.intersections.length ; i++) {
+		var intersection = input.intersections[i];
+		console.log(intersection);
+
+
+		for(var j = 0 ; j < intersection.direction.length ; j++) {
+			retrieveImages(input.intersections[i].direction[j], intersection)
+		}
+	}*/
+	//console.log(input)
+	saveFile(outputFile, input);
 }
 
 main()

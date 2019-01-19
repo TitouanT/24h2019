@@ -2,23 +2,18 @@
 	"intersections": [
 		{
 			"center": {
-				"lat": 48.0159348,
-				"lon": 0.2034504
+				"lat": 47.974303, 
+				"lon": 0.2064673
 			},
 			"direction": [
 				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
+					"lat": 47.974303, 
+					"lon": 0.2064673,
 					"crossingType": "stop"
 				},
 				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
-					"crossingType": "none"
-				},
-				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
+					"lat": 47.974303, 
+					"lon": 0.2064673,
 					"crossingType": "stop"
 				}
 			]

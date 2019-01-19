@@ -3,23 +3,30 @@
 		{
 			"center": {
 				"lat": 48.0159348,
-				"lon": 0.2034504
+				"long": 0.2034504
 			},
 			"direction": [
 				{
 					"lat": 48.0159348,
-					"lon": 0.2034504,
-					"crossingType": "stop"
-				},
-				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
-					"crossingType": "none"
-				},
-				{
-					"lat": 48.0159348,
-					"lon": 0.2034504,
-					"crossingType": "stop"
+					"long": 0.2034504,
+					"crossingType": "stop",
+					"images": [
+						{
+							"path": "azertyuiop.jpg",
+							"distanceToCenter": 5,
+							"angleFromOrientation": 30
+						},
+						{
+							"path": "qsdfghjklm.jpg",
+							"distanceToCenter": 5,
+							"angleFromOrientation": 30
+						},
+						{
+							"path": "wxcvbnkkzç.jpg",
+							"distanceToCenter": 5,
+							"angleFromOrientation": 30
+						}
+					]
 				}
 			]
 		}
