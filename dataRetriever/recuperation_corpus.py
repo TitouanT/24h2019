@@ -36,7 +36,8 @@ def forward(node):
     index = way["nodes"].index(node["id"])
     if index == 0:
         return None
-    othernode = nodes_by_id[way["nodes"][index - 1]]
+    dMax = min(len(way["nodes"]) - index - 1, 5)
+    othernode = nodes_by_id[way["nodes"][index - dMax]]
 
     obj = {}
     center = {}
@@ -64,10 +65,8 @@ def backward(node):
     if index == len(way["nodes"]) -1:
         return None
 
-    if len(way["nodes"]) >= index + 3:
-        othernode = nodes_by_id[way["nodes"][index + 2]]
-    else:
-        othernode = nodes_by_id[way["nodes"][index + 1]]
+    dMax = min(len(way["nodes"]) - index - 1, 5)
+    othernode = nodes_by_id[way["nodes"][index + dMax]]
 
 
     obj = {}

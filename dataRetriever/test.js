@@ -67,6 +67,10 @@ class Position {
 		this.lon = lon;
 	}
 
+	static fromJSON(json) {
+		return new Position(json.lat, json.lon)
+	}
+
 	debug() {
 		console.log(this.lat.toFixed(6) + "\t" + this.lon.toFixed(6) + "\tcross5\tred\t1");
 	}
@@ -137,6 +141,7 @@ class Position {
 
 
 
+
 	static getBufferAroundPoints(points) {
 
 		let json = Position.toGeoJSON(points);
@@ -154,30 +159,53 @@ class Position {
 
 		var buffer = (new jsts.io.GeoJSONReader()).read(geom); // normalement g!!!!!!!!!!!!
 
-		const envl = buffer.getEnvelopeInternal();
+		return buffer;
 
-					return picManager 
-					.startPicsRetrieval(
-						new P4C.LatLngBounds(new P4C.LatLng(envl.getMinY(), envl.getMinX()), new P4C.LatLng(envl.getMaxY(), envl.getMaxX())),
-						{
-							mindate: 0
-						}
-					)
-					.then(pics => {
-						//Only send pics in buffer around feature geometry
-						return pics.filter(p => {
-							console.log(p.pictureUrl);
-							return buffer.contains(
-								geomFactory.createPoint(
-									new jsts.geom.Coordinate(
-										p.coordinates.lng,
-										p.coordinates.lat
-									)
-								)
-							);
-						});
+	}
 
-					}).catch(console.log);
+
+	static getImages(points) {
+
+		const buffer = Position.getBufferAroundPoints(points); 
+		const envl   = buffer.getEnvelopeInternal();
+
+		console.log("=====")
+		debug({"lat": envl.getMinY(), "lon": envl.getMinX()});
+		debug({"lat": envl.getMaxY(), "lon": envl.getMaxX()});
+
+		var images = picManager
+			.startPicsRetrieval(
+				new P4C.LatLngBounds(
+					new P4C.LatLng(envl.getMinY(), envl.getMinX()), 
+					new P4C.LatLng(envl.getMaxY(), envl.getMaxX())
+				), {mindate: 0})
+			.then(pics => {
+				//Only send pics in buffer around feature geometry
+				return pics.filter(p => {
+					if(p.pictureUrl == "https://d1cuyjsrcm0gby.cloudfront.net/jvOJribQEz85GeyPKLbzpw/thumb-2048.jpg") {
+						console.log(p);
+						console.log(points);
+						console.log(envl.getMinY(), envl.getMinX());
+						console.log(envl.getMaxY(), envl.getMaxX());
+					}
+					//console.log(p.pictureUrl);
+					var insideBuffer = buffer.contains(
+						geomFactory.createPoint(
+							new jsts.geom.Coordinate(
+								p.coordinates.lng,
+								p.coordinates.lat
+							)
+						)
+					);
+					if(insideBuffer) {
+						console.log(p.pictureUrl);
+					}
+					else {
+						//console.log("image not inside ...")
+					}
+				});
+			})
+			.catch(console.log);
 
 	}
 
@@ -277,13 +305,18 @@ var main = function () {
 		console.log(input);
 	});*/
 
-	for(var i = 0 ; i < 20 ; i++){// input.intersections.length ; i++) {
+	for(var i = 0 ; i < 100 ; i++){// input.intersections.length ; i++) {
 		var intersection = input.intersections[i];
-		var p1 = intersection["center"];
-		var p2 = intersection["direction"];
+		var p1 = Position.fromJSON(intersection["center"]);
+		var p2 = Position.fromJSON(intersection["direction"]);
 		debug(p1);
 		debug(p2);
-		Position.getBufferAroundPoints([p1, p2]);
+		var bounds = Position.getBoundsAroundLine(p1, p2);
+		debug(bounds[0]);
+		debug(bounds[1]);
+		console.log("===")
+		//Position.getBufferAroundPoints([p1, p2]);
+		//Position.getImages([p1, p2]);
 	}
 	
 
