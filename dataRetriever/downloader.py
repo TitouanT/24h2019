@@ -11,7 +11,7 @@ def downloadImage(url, filename):
 
 def main():
 
-    input = json.loads(open('input.json').read())
+    input = json.loads(open('edited.json').read())
 
     print(input)
 

@@ -12,8 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "image-downloader": "^3.4.2",
+    "js-sha256": "^0.9.0",
+    "jsts": "^2.0.3",
     "pic4carto": "^2.0.16",
-    "request": "^2.88.0",
-    "jsts": "^2.0.3"
+    "request": "^2.88.0"
   }
 }
