@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python
 import json
 import math
 from pprint import pprint
@@ -18,7 +18,7 @@ for node in nodes:
 
     if "tags" in node:
         tags = node["tags"]
-        if "highway" in tags:
+        if "highway" in tags and "direction" in tags:
             cat = tags["highway"]
             if cat == "stop":
                 stops.append(node)
