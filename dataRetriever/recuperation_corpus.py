@@ -1,5 +1,6 @@
 #!/bin/python3
 import json
+import math
 from pprint import pprint
 
 with open("./raw_overpass_data.json") as f:
@@ -34,10 +35,12 @@ def forward(node):
     way = matching_ways[0]
 
     index = way["nodes"].index(node["id"])
-    if index == 0:
+
+    nodes_before = list(reversed(way["nodes"]))[index+1:]
+    if (len(nodes_before) == 0):
         return None
-    dMax = min(len(way["nodes"]) - index - 1, 5)
-    othernode = nodes_by_id[way["nodes"][index - dMax]]
+
+    match = firstafter10(node, nodes_before)
 
     obj = {}
     center = {}
@@ -48,10 +51,27 @@ def forward(node):
 
     center["lon"] = node["lon"]
     center["lat"] = node["lat"]
-    direction["lon"] = othernode["lon"]
-    direction["lat"] = othernode["lat"]
+    direction["lon"] = match["lon"]
+    direction["lat"] = match["lat"]
 
     return obj
+
+def firstafter10(node, nodes):
+    # lona, lata = noda["lon"], noda["lat"]
+    lonb, latb = node["lon"], node["lat"]
+
+    nodes = [nodes_by_id[i] for i in nodes]
+
+    dist_after = [distlonlat(noda["lon"], noda["lat"], lonb, latb) / 1000 for noda in nodes]
+
+    index = 0
+    for i, d in enumerate(dist_after):
+        if d >= 10:
+            return nodes[i]
+        index = i
+
+    return nodes[index]
+
 
 def backward(node):
 
@@ -62,11 +82,12 @@ def backward(node):
     way = matching_ways[0]
 
     index = way["nodes"].index(node["id"])
-    if index == len(way["nodes"]) -1:
+
+    nodes_after = way["nodes"][index+1:]
+    if (len(nodes_after) == 0):
         return None
 
-    dMax = min(len(way["nodes"]) - index - 1, 5)
-    othernode = nodes_by_id[way["nodes"][index + dMax]]
+    match = firstafter10(node, nodes_after)
 
 
     obj = {}
@@ -78,10 +99,19 @@ def backward(node):
 
     center["lon"] = node["lon"]
     center["lat"] = node["lat"]
-    direction["lon"] = othernode["lon"]
-    direction["lat"] = othernode["lat"]
+    direction["lon"] = match["lon"]
+    direction["lat"] = match["lat"]
+
 
     return obj
+
+def distlonlat(lona, lata, lonb, latb):
+    dlon = lona - lonb
+    dlat = lata - latb
+    a = math.sin(dlat / 2)**2 + math.cos(lata) * math.cos(latb) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distance = 6373.0 * c
+    return distance
 
 for stop in stops:
     fwd = forward(stop)
